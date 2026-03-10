@@ -43,7 +43,7 @@ namespace Infrastructure.Plugins
                 var defaultBranch = await gitClient.GetBranchAsync(
                     project: _config.ProjectName,
                     repositoryId: repoName,
-                    name: "main",
+                    name: "master",
                     cancellationToken: ct
                 );
 
@@ -169,7 +169,7 @@ namespace Infrastructure.Plugins
                     Title=         title,
                     Description=   description,
                     SourceRefName= $"refs/heads/{branchName}",
-                    TargetRefName= "refs/heads/main"
+                    TargetRefName= "refs/heads/master"
                 };
 
                 var created = await gitClient.CreatePullRequestAsync(

@@ -88,40 +88,97 @@ namespace Infrastructure.Plugins
             }
         }
 
-        [KernelFunction("FindExistingTests")]
-        [Description("Busca si ya existe un archivo de tests para una clase dada en el repositorio.")]
-        public async Task<string?> FindExistingTestFileAsync(
-            [Description("Nombre del repositorio")] string repoName,
-            [Description("Nombre de la clase. Ej: OrderService")] string className,
-            CancellationToken ct = default)
+        [KernelFunction("FindTestProjects")]
+        [Description("Busca todos los proyectos de tests en el repo. Usa esto para encontrar dónde están los tests antes de hacer commit. Los proyectos de tests siempre terminan en 'Test'.")]
+        public async Task<string> FindTestProjectsAsync(
+    [Description("Nombre del repositorio")] string repoName,
+    CancellationToken ct = default)
         {
-            _logger.LogInformation("[RepoReader] Buscando tests existentes para {Class}", className);
+            _logger.LogInformation("[RepoReader] Buscando proyectos de tests en {Repo}", repoName);
 
             try
             {
                 using var client = BuildClient();
                 var gitClient = client.GetClient<GitHttpClient>();
 
-                // Busca en la carpeta de tests convencional
+                var items = await gitClient.GetItemsAsync(
+                    project: _config.ProjectName,
+                    repositoryId: repoName,
+                    scopePath: "/",
+                    recursionLevel: VersionControlRecursionType.OneLevel,
+                    cancellationToken: ct
+                );
+
+                var testFolders = items
+                    .Where(i => i.IsFolder
+                             && i.Path != "/"
+                             && i.Path.TrimEnd('/').EndsWith("Test", StringComparison.OrdinalIgnoreCase))
+                    .Select(i => i.Path)
+                    .OrderBy(p => p)
+                    .ToList();
+
+                if (!testFolders.Any())
+                    return "NO_TEST_PROJECTS: No se encontraron carpetas que terminen en 'Test'. " +
+                           "Usa GetRepoStructure para ver la estructura completa del repo.";
+
+                var result = $"Proyectos de tests encontrados ({testFolders.Count}):\n";
+                result += string.Join("\n", testFolders.Select(f => $"  📁 {f}"));
+                result += "\n\nUsa la carpeta más relacionada con la clase que vas a testear.";
+
+                _logger.LogInformation("[RepoReader] Encontrados {Count} proyectos de tests", testFolders.Count);
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[RepoReader] Error buscando proyectos de tests");
+                return $"ERROR: {ex.Message}";
+            }
+        }
+
+        [KernelFunction("FindExistingTestFile")]
+        [Description("Busca si ya existe un archivo de tests para una clase específica dentro de un proyecto de tests.")]
+        public async Task<string> FindExistingTestFileAsync(
+            [Description("Nombre del repositorio")] string repoName,
+            [Description("Path del proyecto de tests. Ej: /WorkerTest")] string testProjectPath,
+            [Description("Nombre de la clase. Ej: OrderService")] string className,
+            CancellationToken ct = default)
+        {
+            _logger.LogInformation("[RepoReader] Buscando tests de {Class} en {Path}", className, testProjectPath);
+
+            try
+            {
+                using var client = BuildClient();
+                var gitClient = client.GetClient<GitHttpClient>();
+
                 var testFileName = $"{className}Tests.cs";
 
                 var items = await gitClient.GetItemsAsync(
                     project: _config.ProjectName,
                     repositoryId: repoName,
-                    scopePath: "/",
+                    scopePath: testProjectPath,
                     recursionLevel: VersionControlRecursionType.Full,
                     cancellationToken: ct
                 );
 
-                var existing = items
-                    .FirstOrDefault(i => i.Path.EndsWith(testFileName, StringComparison.OrdinalIgnoreCase));
+                var existing = items.FirstOrDefault(i =>
+                    i.Path.EndsWith(testFileName, StringComparison.OrdinalIgnoreCase));
 
-                return existing?.Path;
+                if (existing != null)
+                    return $"YA_EXISTE: {existing.Path}";
+
+                return $"NO_EXISTE: No hay tests para '{className}' en '{testProjectPath}'. " +
+                       $"El archivo se creará como: {testProjectPath}/{className}Tests.cs";
+            }
+            catch (VssServiceException ex) when (ex.Message.Contains("could not be found"))
+            {
+                _logger.LogWarning("[RepoReader] Path no encontrado: {Path}", testProjectPath);
+                return $"CARPETA_NO_ENCONTRADA: '{testProjectPath}' no existe. Verifica con FindTestProjects.";
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "[RepoReader] Error buscando tests de {Class}", className);
-                return null;
+                return $"ERROR: {ex.Message}";
             }
         }
 

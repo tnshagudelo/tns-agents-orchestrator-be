@@ -9,17 +9,11 @@ namespace EntryPoints.Web.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]  // requiere JWT válido — configurado en Program.cs
-    public class AgentController : ControllerBase
+    //[Authorize]  // requiere JWT válido — configurado en Program.cs
+    public class AgentController(CoreDispatcher dispatcher, ILogger<AgentController> logger) : ControllerBase
     {
-        private readonly CoreDispatcher _dispatcher;
-        private readonly ILogger<AgentController> _logger;
-
-        public AgentController(CoreDispatcher dispatcher, ILogger<AgentController> logger)
-        {
-            _dispatcher = dispatcher;
-            _logger = logger;
-        }
+        private readonly CoreDispatcher _dispatcher = dispatcher;
+        private readonly ILogger<AgentController> _logger = logger;
 
         /// <summary>
         /// Ejecuta un agente con la petición del usuario.

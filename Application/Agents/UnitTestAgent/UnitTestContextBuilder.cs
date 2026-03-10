@@ -54,7 +54,7 @@ namespace Application.Agents.UnitTestAgent
         {
             // Lee el archivo embebido en el assembly
             var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "Agents.Application.Agents.UnitTestAgent.Prompts.SystemPrompt.txt";
+            var resourceName = "Application.Agents.UnitTestAgent.Prompts.SystemPrompt.txt";
 
             using var stream = assembly.GetManifestResourceStream(resourceName)
                 ?? throw new FileNotFoundException($"No se encontró el recurso: {resourceName}");

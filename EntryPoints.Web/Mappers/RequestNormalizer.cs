@@ -32,12 +32,12 @@ namespace EntryPoints.Web.Mappers
                 Summary = result.Summary,
                 ErrorDetail = result.ErrorDetail,
                 CompletedAt = result.CompletedAt,
-                Artifacts = result.Artifacts.Select(a => new ArtifactDto
+                Artifacts = [.. result.Artifacts.Select(a => new ArtifactDto
                 {
                     Type = a.Type,
                     Label = a.Label,
                     Value = a.Value
-                }).ToList()
+                })]
             };
         }
 

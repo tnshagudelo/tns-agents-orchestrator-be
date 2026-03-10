@@ -1,6 +1,7 @@
 <Solution>
   <Project Path="Application/Application.csproj" />
   <Project Path="Domain/Domain.csproj" />
+  <Project Path="EntryPoints.Web/EntryPoints.Web.csproj" Id="e97b1189-17d0-4e5a-adef-1361b9715bbe" />
   <Project Path="Infrastructure/Infrastructure.csproj" />
   <Project Path="Worker/Worker.csproj" Id="16f5fe87-eba9-46f5-a210-41c2aaa39bee" />
 </Solution>

@@ -49,19 +49,16 @@ var app = builder.Build();
 
 // ── Pipeline ──────────────────────────────────────────────────────────────────
 app.UseSerilogRequestLogging();
+app.UseHttpsRedirection();
 app.UseCors("AngularPortal");
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

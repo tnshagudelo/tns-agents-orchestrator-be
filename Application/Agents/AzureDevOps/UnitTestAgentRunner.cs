@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 
-namespace Application.Agents.UnitTestAgent
+namespace Application.Agents.AzureDevOps
 {
     /// <summary>
     /// Runner del UnitTestAgent.

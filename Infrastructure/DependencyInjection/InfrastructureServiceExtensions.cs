@@ -1,13 +1,13 @@
-﻿using Application.Agents.UnitTestAgent;
+﻿using Application.Agents.ProjectManagerAgent;
+using Application.Agents.UnitTestAgent;
 using Application.Orchestration;
 using Application.Shared;
 using Domain.Interfaces;
 using Infrastructure.Logging;
+using Infrastructure.Persistence;
 using Infrastructure.Plugins;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.DependencyInjection
 {
@@ -51,12 +51,30 @@ namespace Infrastructure.DependencyInjection
 
             // Kernel config
             services.AddSingleton(kernelConfig);
+            
+            // Dispatcher
+            services.AddSingleton<CoreDispatcher>();
+
+            // Repositorios de conversación y estimaciones
+            services.AddSingleton<IConversationRepository>(sp =>
+                new ConversationRepository(
+                    config.SqlConnectionString,
+                    sp.GetRequiredService<ILogger<ConversationRepository>>()
+                ));
+
+            services.AddSingleton<IEstimationRepository>(sp =>
+                new EstimationRepository(
+                    config.SqlConnectionString,
+                    sp.GetRequiredService<ILogger<EstimationRepository>>()
+                ));
+
+            services.AddSingleton<IAgentOutputHandler, ProjectEstimationOutputHandler>();
+            // ConversationService genérico — recibe todos los handlers automáticamente
+            services.AddSingleton<ConversationService>();
 
             // Agentes — registrados como IAgentRunner para que el Dispatcher los encuentre
             services.AddSingleton<IAgentRunner, UnitTestAgentRunner>();
-
-            // Dispatcher
-            services.AddSingleton<CoreDispatcher>();
+            services.AddSingleton<IAgentRunner, ProjectManagerAgentRunner>();
 
             return services;
         }

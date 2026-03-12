@@ -43,5 +43,17 @@ namespace Application.Orchestration
 
             return await runner.RunAsync(request, ct);
         }
+
+        /// <summary>
+        /// Devuelve el runner para un agente específico.
+        /// Usado por el stream controller para acceder al runner directamente.
+        /// </summary>
+        public IAgentRunner GetRunner(AgentType agentType)
+        {
+            if (!_runners.TryGetValue(agentType, out var runner))
+                throw new ArgumentException($"No existe runner para '{agentType}'");
+
+            return runner;
+        }
     }
 }

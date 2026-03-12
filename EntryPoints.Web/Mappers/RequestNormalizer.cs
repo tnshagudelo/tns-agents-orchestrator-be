@@ -46,6 +46,7 @@ namespace EntryPoints.Web.Mappers
             return agent.ToLowerInvariant() switch
             {
                 "unittestagent" => AgentType.UnitTestAgent,
+                "projectmanageragent" => AgentType.ProjectManagerAgent,
                 _ => throw new ArgumentException($"Agente desconocido: '{agent}'")
             };
         }

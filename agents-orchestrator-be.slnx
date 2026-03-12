@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="Agent.Api/Agent.Api.csproj" Id="38769313-6e63-42b9-9245-cdd51e6899df" />
   <Project Path="Application/Application.csproj" />
   <Project Path="Domain/Domain.csproj" />
   <Project Path="EntryPoints.Web/EntryPoints.Web.csproj" Id="e97b1189-17d0-4e5a-adef-1361b9715bbe" />

@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Agents\ProjectManagerAgent\Prompts\SystemPrompt.txt" />
     <None Remove="Agents\UnitTestAgent\Prompts\SystemPrompt.txt" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Agents\ProjectManagerAgent\Prompts\SystemPrompt.txt" />
     <EmbeddedResource Include="Agents\UnitTestAgent\Prompts\SystemPrompt.txt" />
   </ItemGroup>
 
@@ -22,10 +24,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Domain\Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Agents\AzureDevOps\Prompts\" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "EntryPoints.Web\\EntryPoints.Web.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "Agent.Api\\Agent.Api.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
